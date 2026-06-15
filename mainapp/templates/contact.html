@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Contact | Abhay Singh
+{% endblock %}
+
+{% block content %}
+
+<section class="contact-page">
+
+    <div class="contact-header">
+
+        <span>Get In Touch</span>
+
+        <h1>
+            Let's Work Together
+        </h1>
+
+        <p>
+            Feel free to contact me for Data Analytics,
+            Machine Learning, Django Development,
+            Freelancing, or Collaboration Opportunities.
+        </p>
+
+    </div>
+
+    <div class="contact-container">
+
+        <!-- LEFT SIDE -->
+
+        <div class="contact-info">
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    <i class="fa-solid fa-envelope"></i>
+                </div>
+
+                <div>
+                    <h3>Email</h3>
+                    <p>srinetabhaysingh14@gmail.com</p>
+                </div>
+
+            </div>
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    <i class="fa-solid fa-phone"></i>
+                </div>
+
+                <div>
+                    <h3>Phone</h3>
+                    <p>+91 7985397219</p>
+                </div>
+
+            </div>
+
+            <div class="info-card">
+
+                <div class="info-icon">
+                    <i class="fa-solid fa-location-dot"></i>
+                </div>
+
+                <div>
+                    <h3>Location</h3>
+                    <p>Gorakhpur, Uttar Pradesh, India</p>
+                </div>
+
+            </div>
+
+            <div class="social-links-contact">
+
+                <a href="#">
+                    <i class="fa-brands fa-github"></i>
+                </a>
+
+                <a href="#">
+                    <i class="fa-brands fa-linkedin"></i>
+                </a>
+
+                <a href="#">
+                    <i class="fa-brands fa-instagram"></i>
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- RIGHT SIDE -->
+
+        <div class="contact-form-card">
+
+            <form method="post">
+
+                {% csrf_token %}
+
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" placeholder="Enter your name">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" placeholder="Enter your email">
+                </div>
+
+                <div class="form-group">
+                    <label>Subject</label>
+                    <input type="text" name="subject" placeholder="Enter subject">
+                </div>
+
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea name="message" rows="6" placeholder="Write your message"></textarea>
+                </div>
+
+                <button type="submit" class="contact-btn">
+                    Send Message
+                    <i class="fa-solid fa-paper-plane"></i>
+                </button>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

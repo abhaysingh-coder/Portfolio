@@ -1,0 +1,76 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}My Portfolio{% endblock %}</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'CSS/style.css' %}?v=2">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{% static 'Image/favicon.png' %}" type="image/x-icon">
+</head>
+<body>
+
+    <!-- Navbar -->
+    <header class="header">
+        <nav class="navbar">
+
+            <a href="{% url 'Index' %}" class="logo">
+                <i class="fa-solid fa-code"></i>
+                Portfolio
+            </a>
+
+            <ul class="nav-links" id="navLinks">
+                <li><a href="{% url 'Index' %}">Home</a></li>
+                <li><a href="{% url 'About' %}">About</a></li>
+                <li><a href="{% url 'Skills' %}">Skills</a></li>
+                <li><a href="{% url 'Projects' %}">Projects</a></li>
+                <li><a href="{% url 'Contact' %}">Contact</a></li>
+            </ul>
+
+            <button class="menu-btn" onclick="toggleMenu()">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        {% block content %}
+
+        {% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+
+            <h2>Abhay Singh</h2>
+            <p>Python Developer | Django Developer | Data Science Learner</p>
+
+            <div class="social-links">
+                <a href="https://github.com/abhaysingh-coder"><i class="fa-brands fa-github"></i></a>
+                <a href="https://linkedin.com/in/abhay-singh-581423257"><i class="fa-brands fa-linkedin"></i></a>
+                <a href="https://www.instagram.com/abhay_singh_srinet_?igsh=enBnam1wODVuZTY2"><i class="fa-brands fa-instagram"></i></a>
+                <a href="srinetabhaysingh14@gmail.com"><i class="fa-solid fa-envelope"></i></a>
+            </div>
+
+            <p class="copyright">
+                © 2026 Abhay Singh. All Rights Reserved.
+            </p>
+
+        </div>
+    </footer>
+
+    <!-- JS -->
+    <script src="{% static 'JS/script.js' %}"></script>
+
+</body>
+</html>

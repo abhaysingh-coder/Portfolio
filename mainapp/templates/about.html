@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+About | Abhay Singh
+{% endblock %}
+
+{% block content %}
+
+<section class="about-wrapper">
+
+    <!-- HERO ABOUT -->
+    <div class="about-hero">
+
+        <div class="about-left">
+
+            <span class="about-badge">
+                About Me
+            </span>
+
+            <h1>
+                Hi, I'm <span>Abhay Singh</span>
+            </h1>
+
+            <h3>
+                Data Analyst | Data Science Enthusiast | Django Developer
+            </h3>
+
+            <p>
+                I am a Computer Science student passionate about Data Analytics,
+                Machine Learning, Deep Learning, and Full Stack Web Development.
+                I enjoy building data-driven applications, dashboards, prediction
+                systems, and intelligent recommendation platforms.
+            </p>
+
+            <div class="about-buttons">
+                <a href="{% url 'Projects' %}" class="btn">
+                    View Projects
+                </a>
+
+                <a href="{% url 'Contact' %}" class="btn btn-outline">
+                    Contact Me
+                </a>
+            </div>
+
+        </div>
+
+        <div class="about-right">
+
+            <div class="about-profile-card">
+
+                <div class="about-profile-icon">
+                    <img src="{% static 'Image/profile.jpg' %}" alt="Abhay Singh">
+                </div>
+
+                <h2>Abhay Singh</h2>
+                <p>Data Analyst</p>
+
+                <div class="about-profile-info">
+
+                    <div>
+                        <i class="fa-solid fa-location-dot"></i>
+                        <span>Gorakhpur, Uttar Pradesh</span>
+                    </div>
+
+                    <div>
+                        <i class="fa-solid fa-envelope"></i>
+                        <span>srinetabhaysingh14@gmail.com</span>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+    <div class="about-stats-grid">
+
+        <div class="about-stat-card">
+            <h2>{{ count_project }}</h2>
+            <p>Projects</p>
+        </div>
+
+        <div class="about-stat-card">
+            <h2>2</h2>
+            <p>Internships</p>
+        </div>
+
+        <div class="about-stat-card">
+            <h2>10+</h2>
+            <p>Technologies</p>
+        </div>
+
+        <div class="about-stat-card">
+            <h2>85%+</h2>
+            <p>ML Accuracy</p>
+        </div>
+
+    </div>
+
+    <!-- WHO I AM -->
+    <div class="about-section-card">
+
+        <h2>
+            Who I Am
+        </h2>
+
+        <p>
+            I am a results-driven Data Science professional with experience in
+            machine learning, data analytics, statistical modeling, and web
+            application development. I work with Python, SQL, Power BI, Django,
+            Pandas, NumPy, Matplotlib, Seaborn, Scikit-Learn, TensorFlow, and
+            Keras.
+        </p>
+
+        <p>
+            I have worked on real-world projects such as a Car Marketplace and
+            Management System, Netflix AI Recommendation System, Django Chatbot
+            Web Application, Netflix Data Analysis, and Entertainer Career
+            Analysis.
+        </p>
+
+    </div>
+
+    <!-- EDUCATION AND EXPERIENCE -->
+    <div class="about-two-column">
+
+        <div class="about-section-card">
+
+            <h2>
+                Education
+            </h2>
+
+            <div class="about-timeline-item">
+                <i class="fa-solid fa-graduation-cap"></i>
+
+                <div>
+                    <h3>B.Tech in Computer Science</h3>
+                    <p>SR Institute of Management and Technology, Lucknow</p>
+                </div>
+            </div>
+
+            <div class="about-timeline-item">
+                <i class="fa-solid fa-school"></i>
+
+                <div>
+                    <h3>10th and 12th</h3>
+                    <p>Divine Public School, Gorakhpur</p>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="about-section-card">
+
+            <h2>
+                Experience
+            </h2>
+
+            <div class="about-timeline-item">
+                <i class="fa-solid fa-briefcase"></i>
+
+                <div>
+                    <h3>Softpro India</h3>
+                    <p>Data Science Internship | Lucknow</p>
+                </div>
+            </div>
+
+            <div class="about-timeline-item">
+                <i class="fa-solid fa-laptop-code"></i>
+
+                <div>
+                    <h3>Unified Mentor</h3>
+                    <p>Data Science Intern | Remote</p>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- SKILLS -->
+    <div class="about-section-card">
+
+        <h2>
+            Core Skills
+        </h2>
+
+        <div class="about-skills-grid">
+
+            <div class="about-skill-box">
+                <i class="fa-brands fa-python"></i>
+                <span>Python</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-solid fa-database"></i>
+                <span>SQL</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-solid fa-chart-line"></i>
+                <span>Power BI</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-solid fa-brain"></i>
+                <span>Machine Learning</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-solid fa-robot"></i>
+                <span>Deep Learning</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-solid fa-code"></i>
+                <span>Django</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-brands fa-html5"></i>
+                <span>HTML</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-brands fa-css3-alt"></i>
+                <span>CSS</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-brands fa-js"></i>
+                <span>JavaScript</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-brands fa-bootstrap"></i>
+                <span>Bootstrap</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>EDA</span>
+            </div>
+
+            <div class="about-skill-box">
+                <i class="fa-solid fa-table"></i>
+                <span>Excel</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

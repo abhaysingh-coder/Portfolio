@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}
+{{ project.Name|clean_name|title }} | Project Details
+{% endblock %}
+
+{% block content %}
+
+<section class="project-detail-page">
+
+    <div class="detail-header">
+
+        <span class="detail-category">
+            {{ project.Category }}
+        </span>
+
+        <h1>
+            {{ project.Name|clean_name|title }}
+        </h1>
+
+        <p>
+            {{ project.Description }}
+        </p>
+
+    </div>
+
+    <div class="detail-card">
+
+        <h2>Project Overview</h2>
+
+        <p>
+            {{ project.Detail }}
+        </p>
+
+        <div class="detail-actions">
+
+            <a href="{{ project.Github }}" target="_blank" class="github-link">
+                <i class="fa-brands fa-github"></i>
+                GitHub Repository
+            </a>
+
+            {% if project.Project %}
+            <a href="{{ project.Project }}" target="_blank" class="live-link">
+                Live Demo
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

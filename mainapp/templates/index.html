@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+Home | Abhay Singh
+{% endblock %}
+
+{% block content %}
+
+<section class="hero-section">
+
+    <div class="hero-content">
+
+        <span class="hero-badge">
+            Data Analyst | Data Science | Django Developer
+        </span>
+
+        <h1>
+            Hi, I'm <span>Abhay Singh</span>
+        </h1>
+
+        <h2>
+            I build data-driven web applications, machine learning models,
+            dashboards, and intelligent recommendation systems.
+        </h2>
+
+        <p>
+            Results-driven Data Science professional skilled in Python, SQL,
+            Power BI, Machine Learning, Django, Data Analytics, and Statistical
+            Modeling.
+        </p>
+
+        <div class="hero-buttons">
+
+            <a href="{% url 'Projects' %}" class="btn">
+                View Projects
+            </a>
+
+            <a href="{% static 'CV/Abhay_Singh_CV.pdf' %}" download class="btn btn-outline">
+                <i class="fa-solid fa-download"></i>
+                Download CV
+            </a>
+
+            <a href="{% url 'Contact' %}" class="btn btn-outline">
+                Contact Me
+            </a>
+
+        </div>
+
+        <div class="hero-info">
+
+            <div>
+                <i class="fa-solid fa-envelope"></i>
+                <span>srinetabhaysingh14@gmail.com</span>
+            </div>
+
+            <div>
+                <i class="fa-solid fa-phone"></i>
+                <span>7985397219</span>
+            </div>
+
+            <div>
+                <i class="fa-solid fa-location-dot"></i>
+                <span>Gorakhpur, Uttar Pradesh</span>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="hero-image">
+
+        <div class="profile-card">
+
+            <div class="profile-icon">
+                <img src="{% static 'Image/profile.jpg' %}" alt="Abhay Singh">
+            </div>
+
+            <h3>Abhay Singh</h3>
+            <p>Data Analyst</p>
+
+            <div class="profile-social">
+                <a href="https://www.linkedin.com/in/abhay-singh-581423257" target="_blank">
+                    <i class="fa-brands fa-linkedin"></i>
+                </a>
+
+                <a href="https://github.com/abhaysingh-coder" target="_blank">
+                    <i class="fa-brands fa-github"></i>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+{{ block.super }}
+
+{% endblock %}
