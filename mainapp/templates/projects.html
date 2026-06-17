@@ -22,8 +22,6 @@ Projects | Abhay Singh
 
         {% for project in projects %}
 
-        <a href="{% url 'Project_Detail' project.Name %}" class="project-card-link">
-
             <div class="project-card-box">
 
                 <div class="project-card-top">
@@ -48,23 +46,32 @@ Projects | Abhay Singh
 
                 <div class="project-actions">
 
-                    <span class="action github">
-                        <i class="fa-brands fa-github"></i>
-                        Repository
-                    </span>
+                    <a href="{{ project.Github }}">
+                        <span class="action github">
+                            <i class="fa-brands fa-github"></i>
+                            Repository
+                        </span>
+                    </a>
 
                     {% if project.Project %}
-                    <span class="action live">
-                        <i class="fa-solid fa-globe"></i>
-                        Live Demo
-                    </span>
+                    <a href="{{ project.Project }}">
+                        <span class="action live">
+                            <i class="fa-solid fa-globe"></i>
+                            Live Demo
+                        </span>
+                    </a>
                     {% endif %}
+
+                    <a href="{% url 'Project_Detail' project.Name %}" class="project-card-link">
+                        <span class="action detail-btn">
+                            <i class="fa-solid fa-circle-info"></i>
+                            View Detail
+                        </span>
+                    </a>
 
                 </div>
 
             </div>
-
-        </a>
 
         {% endfor %}
 

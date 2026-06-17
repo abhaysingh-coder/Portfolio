@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Project Database
+{% endblock %}
+
+{% block content %}
+
+<section class="db-page">
+
+    <div class="db-card">
+
+        <span class="db-badge">Database Manager</span>
+
+        <h1>Project Database</h1>
+
+        <p>
+            Check total records in database and import project data from your CSV file.
+        </p>
+
+        {% if message %}
+        <div class="db-success">
+            {{ message }}
+        </div>
+        {% endif %}
+
+        <div class="db-stats">
+
+            <div class="db-stat-box">
+                <h2>{{ db_count }}</h2>
+                <p>Database Records</p>
+            </div>
+
+            <div class="db-stat-box">
+                <h2>{{ csv_count }}</h2>
+                <p>CSV Records</p>
+            </div>
+
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <button type="submit" class="db-btn">
+                Import / Update CSV Data
+            </button>
+        </form>
+
+    </div>
+
+</section>
+
+{% endblock %}

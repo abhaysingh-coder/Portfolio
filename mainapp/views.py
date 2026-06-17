@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from django.core.mail import send_mail
 from django.conf import settings
+from .models import Projects
 
 data = pd.read_csv('Data.csv')
 data = data.replace({np.nan: None})
@@ -27,7 +28,7 @@ def index(request):
 def about(request):
     try:
         context ={
-            'count_project': data['S.No'].count()
+            'count_project': Projects.objects.count()
         }
         return render(request, 'about.html', context)
     except Exception as e:
@@ -42,7 +43,7 @@ def skills(request):
 def projects(request):
     try:
         context ={
-            'projects': data.to_dict('records'),
+            'projects': Projects.objects.all(),
         }
         return render(request, 'projects.html', context)
     except Exception as e:
@@ -66,12 +67,47 @@ def contact(request):
     
 def projectdetail(request, project_name):
     try:
-        project = data[data['Name']== project_name]
-        if project.empty:
+        project = Projects.objects.filter(Name = project_name).first()
+        if project is None:
             return render(request, 'error.html', {'error': 'Project Not Found'})
         context ={
-            'project': project.iloc[0].to_dict(),
+            'project': project,
         }
         return render(request, 'projectdetail.html', context)
     except Exception as e:
         return render(request, 'error.html', {'error':e})
+    
+
+def project_database(request):
+    try:
+        message = None
+        data = pd.read_csv('Data.csv')
+        data = data.replace({np.nan: ''})
+        if request.method == 'POST':
+            count = 0
+
+            for _, row in data.iterrows():
+                Projects.objects.update_or_create(
+                    Name=row['Name'],
+                    defaults={
+                        'Category': row.get('Category', ''),
+                        'Description': row.get('Description', ''),
+                        'Detail': row.get('Detail', ''),
+                        'Github': row.get('Github', ''),
+                        'Project': row.get('Project', ''),
+                    }
+                )
+                count += 1
+
+            message = f'{count} records added/updated successfully.'
+
+        context = {
+            'db_count': Projects.objects.count(),
+            'csv_count': len(data),
+            'message': message
+        }
+
+        return render(request, 'project_database.html', context)
+
+    except Exception as e:
+        return render(request, 'error.html', {'error': e})

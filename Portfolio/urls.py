@@ -27,4 +27,5 @@ urlpatterns = [
     path('Projects', views.projects, name='Projects'),
     path('Projects/<str:project_name>', views.projectdetail, name='Project_Detail'),
     path('Contact', views.contact, name='Contact'),
+    path('Project-Database/', views.project_database, name='Project_Database'),
 ]
