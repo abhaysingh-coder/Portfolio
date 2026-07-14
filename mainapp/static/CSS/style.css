@@ -1579,3 +1579,147 @@ main{
     background:#0ea5e9;
     color:#020617;
 }
+
+.csv-admin-page,
+.csv-form-page{
+    padding:50px 0;
+}
+
+.csv-admin-header{
+    text-align:center;
+    max-width:850px;
+    margin:0 auto 40px;
+}
+
+.csv-admin-header span{
+    display:inline-block;
+    padding:9px 20px;
+    border-radius:50px;
+    background:rgba(56,189,248,.15);
+    color:#38bdf8;
+    margin-bottom:18px;
+}
+
+.csv-admin-header h1{
+    font-size:3rem;
+    margin-bottom:10px;
+}
+
+.csv-admin-header p{
+    color:#94a3b8;
+    margin-bottom:25px;
+}
+
+.csv-add-btn{
+    display:inline-block;
+    padding:13px 25px;
+    border-radius:12px;
+    background:#38bdf8;
+    color:#020617;
+    font-weight:700;
+}
+
+.csv-table-card{
+    background:#1e293b;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:22px;
+    padding:25px;
+    overflow-x:auto;
+}
+
+.csv-table{
+    width:100%;
+    min-width:900px;
+    border-collapse:collapse;
+}
+
+.csv-table th,
+.csv-table td{
+    padding:15px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+    text-align:left;
+}
+
+.csv-table th{
+    color:#38bdf8;
+    background:#0f172a;
+}
+
+.csv-table td{
+    color:#cbd5e1;
+}
+
+.csv-badge{
+    padding:6px 12px;
+    border-radius:50px;
+    background:#0f172a;
+    color:#38bdf8;
+}
+
+.csv-actions{
+    display:flex;
+    gap:10px;
+}
+
+.edit-btn,
+.delete-btn{
+    padding:8px 14px;
+    border-radius:8px;
+    font-weight:600;
+}
+
+.edit-btn{
+    background:#38bdf8;
+    color:#020617;
+}
+
+.delete-btn{
+    background:#ef4444;
+    color:white;
+}
+
+.csv-form-card{
+    max-width:700px;
+    margin:auto;
+    background:#1e293b;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:24px;
+    padding:35px;
+}
+
+.csv-form-card h1{
+    text-align:center;
+    margin-bottom:25px;
+}
+
+.csv-form-card form{
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+}
+
+.csv-form-card input,
+.csv-form-card textarea{
+    width:100%;
+    padding:14px 18px;
+    background:#0f172a;
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:12px;
+    color:white;
+    font-family:inherit;
+}
+
+.csv-form-card textarea{
+    min-height:120px;
+    resize:vertical;
+}
+
+.csv-form-card button{
+    padding:15px;
+    border:none;
+    border-radius:12px;
+    background:#38bdf8;
+    color:#020617;
+    font-weight:700;
+    cursor:pointer;
+}

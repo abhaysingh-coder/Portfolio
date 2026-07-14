@@ -1,21 +1,36 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import numpy as np
 import pandas as pd
 from django.core.mail import send_mail
 from django.conf import settings
-from .models import Projects
+from .models import *
+import os
 
-data = pd.read_csv('Data.csv')
-data = data.replace({np.nan: None})
+CSV_PATH = os.path.join(settings.BASE_DIR, 'Data.csv')
+
+def read_projects_csv():
+    data = pd.read_csv(CSV_PATH)
+    data = data.replace({np.nan: None})
+    return data
 
 
 def mail(subject, name, email, message):
     send_mail(
     subject=f'Portfolio Contact: {subject}',
     message=f'''You have a Message from {name} whose Email is {email} and the Message is :-\n{message}''', 
-    from_email=settings.EMAIL_HOST_USER, 
+    from_email=settings.EMAIL_CONFIGS['portfolio']['host_user'], 
     recipient_list=['srinetabhaysingh14@gmail.com'], 
     fail_silently=False
+    )
+
+
+def confirmationmail(subject, name, email, message):
+    send_mail(
+        subject=f'Thank You for Contacting Me',
+        message=f'''Dear { name },\nThank you for reaching out through my portfolio website.\n\nI have successfully received your message and will review it shortly. I appreciate your interest and will get back to you as soon as possible.\n\nHere is a copy of your submission:\n\nName: { name }\nEmail: { email }\nSubject: { subject }\n\nMessage:\n{ message }\n\nThank you for your time.\n\nBest Regards,\n\nAbhay Singh\nData Analyst | Data Science Enthusiast | Django Developer\nPortfolio: https://portfolio-m1il.onrender.com''',
+        from_email=settings.EMAIL_CONFIGS['personal']['host_user'],
+        recipient_list=[email],
+        fail_silently=False
     )
 
 # Create your views here.
@@ -27,8 +42,9 @@ def index(request):
 
 def about(request):
     try:
+        data = read_projects_csv()
         context ={
-            'count_project': Projects.objects.count()
+            'count_project': data['S.No'].count()
         }
         return render(request, 'about.html', context)
     except Exception as e:
@@ -42,8 +58,9 @@ def skills(request):
     
 def projects(request):
     try:
+        data = read_projects_csv()
         context ={
-            'projects': Projects.objects.all(),
+            'projects': data.to_dict('records'),
         }
         return render(request, 'projects.html', context)
     except Exception as e:
@@ -60,6 +77,9 @@ def contact(request):
             subject = request.POST.get('subject')
             message = request.POST.get('message')
             mail(subject, name, email, message)
+            confirmationmail(subject, name, email, message)
+            Request.objects.create(Name=name, Email=email, Subject=subject, Message=message)
+
         context ={}
         return render(request, 'contact.html', context)
     except Exception as e:
@@ -67,47 +87,82 @@ def contact(request):
     
 def projectdetail(request, project_name):
     try:
-        project = Projects.objects.filter(Name = project_name).first()
-        if project is None:
+        data = read_projects_csv()
+        project = data[data['Name'] == project_name]
+        if project.empty:
             return render(request, 'error.html', {'error': 'Project Not Found'})
         context ={
-            'project': project,
+            'project': project.to_dict('records'),
         }
         return render(request, 'projectdetail.html', context)
     except Exception as e:
         return render(request, 'error.html', {'error':e})
     
+def save_projects_csv(data):
+    data.to_csv(CSV_PATH, index=False)
 
-def project_database(request):
+
+def csv_admin_projects(request):
     try:
-        message = None
-        data = pd.read_csv('Data.csv')
-        data = data.replace({np.nan: ''})
-        if request.method == 'POST':
-            count = 0
-
-            for _, row in data.iterrows():
-                Projects.objects.update_or_create(
-                    Name=row['Name'],
-                    defaults={
-                        'Category': row.get('Category', ''),
-                        'Description': row.get('Description', ''),
-                        'Detail': row.get('Detail', ''),
-                        'Github': row.get('Github', ''),
-                        'Project': row.get('Project', ''),
-                    }
-                )
-                count += 1
-
-            message = f'{count} records added/updated successfully.'
-
+        data = read_projects_csv()
         context = {
-            'db_count': Projects.objects.count(),
-            'csv_count': len(data),
-            'message': message
+            'projects': data.to_dict('records'),
+            'total_projects': len(data),
         }
+        return render(request, 'csv_admin_projects.html', context)
+    except Exception as e:
+        return render(request, 'error.html', {'error': e})
 
-        return render(request, 'project_database.html', context)
 
+def add_csv_project(request):
+    try:
+        if request.method == 'POST':
+            data = read_projects_csv()
+            new_project = {
+                'Name': request.POST.get('Name'),
+                'Category': request.POST.get('Category'),
+                'Description': request.POST.get('Description'),
+                'Detail': request.POST.get('Detail'),
+                'Github': request.POST.get('Github'),
+                'Project': request.POST.get('Project'),
+            }
+            data.loc[len(data)] = new_project
+            save_projects_csv(data)
+            return redirect('CSV_Admin_Projects')
+        return render(request, 'add_csv_project.html')
+    except Exception as e:
+        return render(request, 'error.html', {'error': e})
+
+
+def edit_csv_project(request, project_name):
+    try:
+        data = read_projects_csv()
+        project = data[data['Name'] == project_name]
+        if project.empty:
+            return render(request, 'error.html', {'error': 'Project not found'})
+        index = project.index[0]
+        if request.method == 'POST':
+            data.loc[index, 'Name'] = request.POST.get('Name')
+            data.loc[index, 'Category'] = request.POST.get('Category')
+            data.loc[index, 'Description'] = request.POST.get('Description')
+            data.loc[index, 'Detail'] = request.POST.get('Detail')
+            data.loc[index, 'Github'] = request.POST.get('Github')
+            data.loc[index, 'Project'] = request.POST.get('Project')
+            save_projects_csv(data)
+            return redirect('CSV_Admin_Projects')
+        context = {
+            'project': project.iloc[0].to_dict()
+        }
+        return render(request, 'edit_csv_project.html', context)
+    except Exception as e:
+        return render(request, 'error.html', {'error': e})
+
+
+def delete_csv_project(request, project_name):
+    try:
+        data = read_projects_csv()
+        data = data[data['Name'] != project_name]
+        save_projects_csv(data)
+        return redirect('CSV_Admin_Projects')
     except Exception as e:
         return render(request, 'error.html', {'error': e})

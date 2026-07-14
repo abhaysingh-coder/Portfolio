@@ -62,12 +62,14 @@ Projects | Abhay Singh
                     </a>
                     {% endif %}
 
-                    <a href="{% url 'Project_Detail' project.Name %}" class="project-card-link">
-                        <span class="action detail-btn">
-                            <i class="fa-solid fa-circle-info"></i>
-                            View Detail
-                        </span>
-                    </a>
+                    {% if project.Name %}
+                        <a href="{% url 'Project_Detail' project.Name %}" class="project-card-link">
+                            <span class="action detail-btn">
+                                <i class="fa-solid fa-circle-info"></i>
+                                View Detail
+                            </span>
+                        </a>
+                    {% endif %}
 
                 </div>
 

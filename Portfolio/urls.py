@@ -25,7 +25,10 @@ urlpatterns = [
     path('About', views.about, name='About'),
     path('Skills', views.skills, name='Skills'),
     path('Projects', views.projects, name='Projects'),
-    path('Projects/<str:project_name>', views.projectdetail, name='Project_Detail'),
+    path('Projects/<str:project_name>/', views.projectdetail, name='Project_Detail'),
     path('Contact', views.contact, name='Contact'),
-    path('Project-Database/', views.project_database, name='Project_Database'),
+    path('admin/csv-projects/', views.csv_admin_projects, name='CSV_Admin_Projects'),
+    path('admin/csv-projects/add/', views.add_csv_project, name='CSV_Add_Project'),
+    path('admin/csv-projects/edit/<str:project_name>/', views.edit_csv_project, name='CSV_Edit_Project'),
+    path('admin/csv-projects/delete/<str:project_name>/', views.delete_csv_project, name='CSV_Delete_Project'),
 ]

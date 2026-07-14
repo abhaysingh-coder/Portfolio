@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+
+{% block title %}
+CSV Project Admin
+{% endblock %}
+
+{% block content %}
+
+<section class="csv-admin-page">
+
+    <div class="csv-admin-header">
+        <span>CSV Admin</span>
+        <h1>Manage Projects</h1>
+        <p>Total Projects: {{ total_projects }}</p>
+
+        <a href="{% url 'CSV_Add_Project' %}" class="csv-add-btn">
+            Add New Project
+        </a>
+    </div>
+
+    <div class="csv-table-card">
+
+        <table class="csv-table">
+            <thead>
+                <tr>
+                    <th>S.No</th>
+                    <th>Project</th>
+                    <th>Category</th>
+                    <th>GitHub</th>
+                    <th>Live</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for project in projects %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>{{ project.Name|clean_name|title }}</td>
+
+                    <td>
+                        <span class="csv-badge">
+                            {{ project.Category }}
+                        </span>
+                    </td>
+
+                    <td>
+                        <a href="{{ project.Github }}" target="_blank">
+                            GitHub
+                        </a>
+                    </td>
+
+                    <td>
+                        {% if project.Project %}
+                        <a href="{{ project.Project }}" target="_blank">
+                            Live
+                        </a>
+                        {% else %}
+                        No Link
+                        {% endif %}
+                    </td>
+
+                    <td class="csv-actions">
+                        <a href="{% url 'CSV_Edit_Project' project.Name %}" class="edit-btn">
+                            Edit
+                        </a>
+
+                        <a href="{% url 'CSV_Delete_Project' project.Name %}" class="delete-btn">
+                            Delete
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+</section>
+
+{% endblock %}
