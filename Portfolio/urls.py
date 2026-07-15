@@ -27,8 +27,9 @@ urlpatterns = [
     path('Projects', views.projects, name='Projects'),
     path('Projects/<str:project_name>/', views.projectdetail, name='Project_Detail'),
     path('Contact', views.contact, name='Contact'),
-    path('admin/csv-projects/', views.csv_admin_projects, name='CSV_Admin_Projects'),
-    path('admin/csv-projects/add/', views.add_csv_project, name='CSV_Add_Project'),
-    path('admin/csv-projects/edit/<str:project_name>/', views.edit_csv_project, name='CSV_Edit_Project'),
-    path('admin/csv-projects/delete/<str:project_name>/', views.delete_csv_project, name='CSV_Delete_Project'),
+    path('admins',views.login_page, name='Login'),
+    path('csv-projects/', views.csv_admin_projects, name='CSV_Admin_Projects'),
+    path('csv-projects/add/', views.add_csv_project, name='CSV_Add_Project'),
+    path('csv-projects/edit/<str:project_name>/', views.edit_csv_project, name='CSV_Edit_Project'),
+    path('csv-projects/delete/<str:project_name>/', views.delete_csv_project, name='CSV_Delete_Project'),
 ]

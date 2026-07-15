@@ -5,6 +5,8 @@ from django.core.mail import send_mail
 from django.conf import settings
 from .models import *
 import os
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.decorators import login_required
 
 CSV_PATH = os.path.join(settings.BASE_DIR, 'Data.csv')
 
@@ -12,7 +14,6 @@ def read_projects_csv():
     data = pd.read_csv(CSV_PATH)
     data = data.replace({np.nan: None})
     return data
-
 
 def mail(subject, name, email, message):
     send_mail(
@@ -97,11 +98,11 @@ def projectdetail(request, project_name):
         return render(request, 'projectdetail.html', context)
     except Exception as e:
         return render(request, 'error.html', {'error':e})
-    
+ 
 def save_projects_csv(data):
     data.to_csv(CSV_PATH, index=False)
 
-
+@login_required(login_url='login')
 def csv_admin_projects(request):
     try:
         data = read_projects_csv()
@@ -113,7 +114,7 @@ def csv_admin_projects(request):
     except Exception as e:
         return render(request, 'error.html', {'error': e})
 
-
+@login_required(login_url='login')
 def add_csv_project(request):
     try:
         if request.method == 'POST':
@@ -133,7 +134,7 @@ def add_csv_project(request):
     except Exception as e:
         return render(request, 'error.html', {'error': e})
 
-
+@login_required(login_url='login')
 def edit_csv_project(request, project_name):
     try:
         data = read_projects_csv()
@@ -157,12 +158,28 @@ def edit_csv_project(request, project_name):
     except Exception as e:
         return render(request, 'error.html', {'error': e})
 
-
+@login_required(login_url='login')
 def delete_csv_project(request, project_name):
     try:
         data = read_projects_csv()
         data = data[data['Name'] != project_name]
         save_projects_csv(data)
         return redirect('CSV_Admin_Projects')
+    except Exception as e:
+        return render(request, 'error.html', {'error': e})
+    
+def login_page(request):
+    try:
+        if request.method == "POST":
+            username = request.POST.get("username")
+            password = request.POST.get("password")
+
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('CSV_Admin_Projects')
+            else:
+                raise Exception("Invalid username or password")
+        return render(request, 'login.html')
     except Exception as e:
         return render(request, 'error.html', {'error': e})
