@@ -6,9 +6,17 @@ from django.conf import settings
 from .models import *
 import os
 from django.contrib.auth import authenticate, login
-from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import cache_control
 
 CSV_PATH = os.path.join(settings.BASE_DIR, 'Data.csv')
+
+def login_required_custom(view_func):
+    def wrapper(request, *args, **kwargs):
+        user = request.session.get('User')
+        if not user:
+            return redirect('Login')
+        return view_func(request, *args, **kwargs)
+    return wrapper
 
 def read_projects_csv():
     data = pd.read_csv(CSV_PATH)
@@ -89,11 +97,11 @@ def contact(request):
 def projectdetail(request, project_name):
     try:
         data = read_projects_csv()
-        project = data[data['Name'] == project_name]
+        project = data[data['Name'].astype(str) == str(project_name)]
         if project.empty:
             return render(request, 'error.html', {'error': 'Project Not Found'})
         context ={
-            'project': project.to_dict('records'),
+            'project': project.iloc[0].to_dict(),
         }
         return render(request, 'projectdetail.html', context)
     except Exception as e:
@@ -102,7 +110,8 @@ def projectdetail(request, project_name):
 def save_projects_csv(data):
     data.to_csv(CSV_PATH, index=False)
 
-@login_required(login_url='login')
+@cache_control(no_store=True, no_cache=True, must_revalidate=True)
+@login_required_custom
 def csv_admin_projects(request):
     try:
         data = read_projects_csv()
@@ -114,7 +123,8 @@ def csv_admin_projects(request):
     except Exception as e:
         return render(request, 'error.html', {'error': e})
 
-@login_required(login_url='login')
+@cache_control(no_store=True, no_cache=True, must_revalidate=True)
+@login_required_custom
 def add_csv_project(request):
     try:
         if request.method == 'POST':
@@ -134,7 +144,8 @@ def add_csv_project(request):
     except Exception as e:
         return render(request, 'error.html', {'error': e})
 
-@login_required(login_url='login')
+@cache_control(no_store=True, no_cache=True, must_revalidate=True)
+@login_required_custom
 def edit_csv_project(request, project_name):
     try:
         data = read_projects_csv()
@@ -158,7 +169,8 @@ def edit_csv_project(request, project_name):
     except Exception as e:
         return render(request, 'error.html', {'error': e})
 
-@login_required(login_url='login')
+@cache_control(no_store=True, no_cache=True, must_revalidate=True)
+@login_required_custom
 def delete_csv_project(request, project_name):
     try:
         data = read_projects_csv()
@@ -177,6 +189,9 @@ def login_page(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
+                request.session['User'] = {
+                    'user': username
+                }
                 return redirect('CSV_Admin_Projects')
             else:
                 raise Exception("Invalid username or password")
