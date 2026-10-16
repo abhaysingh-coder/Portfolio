@@ -192,6 +192,12 @@ Run migrations:
 python manage.py migrate
 ```
 
+Create your admin account:
+
+```bash
+python manage.py createsuperuser
+```
+
 Start server:
 
 ```bash
@@ -203,6 +209,37 @@ Open browser:
 ```text
 http://127.0.0.1:8000/
 ```
+
+## 🔐 Portfolio Admin
+
+Sign in at `http://127.0.0.1:8000/admins` with the staff account created above.
+The admin dashboard lets you add, edit, and remove projects and upload the
+downloadable CV as a PDF (up to 5 MB). The Django administration site is also
+available at `/admin/`.
+
+For deployment, set `DEBUG=False` and provide a strong, private `SECRET_KEY`
+environment variable. The app enables HTTPS redirects, secure cookies, and HSTS
+when debug mode is disabled. If your host uses ephemeral app storage, attach a
+persistent disk and set `PROJECTS_CSV_PATH` and `PORTFOLIO_CV_PATH` to files on
+that disk so admin changes survive restarts and deployments. Render deployments
+default to production mode; set the following in the Render service environment:
+
+* `SECRET_KEY`: a unique, randomly generated secret.
+* `DEBUG=False`.
+* `DATABASE_URL`: a persistent PostgreSQL database URL for production.
+* `RENDER`: set automatically by Render; this enables the production defaults
+  and requires `DATABASE_URL`.
+* `EMAIL_PERSONAL_USER` and `EMAIL_PERSONAL_PASSWORD`.
+* `EMAIL_PORTFOLIO_USER` and `EMAIL_PORTFOLIO_PASSWORD`.
+* `PROJECTS_CSV_PATH` and `PORTFOLIO_CV_PATH`: paths on the mounted persistent
+  disk, for example `/var/data/Data.csv` and `/var/data/Abhay_Singh_CV.pdf`.
+
+Copy the current `Data.csv` and CV PDF to those disk paths once before switching
+the service to them. Back up the disk and database regularly. The build script
+collects static assets and applies migrations; create the staff account
+separately with `python manage.py createsuperuser` using the production
+environment (for example, from the Render shell). It intentionally does not
+attempt to create an administrator with missing credentials during every build.
 
 ---
 

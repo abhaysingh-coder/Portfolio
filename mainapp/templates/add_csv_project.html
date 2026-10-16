@@ -15,12 +15,12 @@ Add Project
         <form method="POST">
             {% csrf_token %}
 
-            <input type="text" name="Name" placeholder="Project Name" required>
-            <input type="text" name="Category" placeholder="Category" required>
-            <textarea name="Description" placeholder="Short Description" required></textarea>
-            <textarea name="Detail" placeholder="Detailed Description"></textarea>
-            <input type="url" name="Github" placeholder="GitHub Link">
-            <input type="url" name="Project" placeholder="Live Project Link">
+            <input type="text" name="Name" maxlength="100" placeholder="Project Name" value="{{ project.Name }}" required>
+            <input type="text" name="Category" maxlength="100" placeholder="Category" value="{{ project.Category }}" required>
+            <textarea name="Description" placeholder="Short Description" required>{{ project.Description }}</textarea>
+            <textarea name="Detail" placeholder="Detailed Description">{{ project.Detail }}</textarea>
+            <input type="url" name="Github" maxlength="200" placeholder="GitHub Link" value="{{ project.Github }}">
+            <input type="url" name="Project" maxlength="200" placeholder="Live Project Link" value="{{ project.Project }}">
 
             <button type="submit">
                 Save Project

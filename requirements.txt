@@ -5,3 +5,4 @@ dj-database-url==3.0.1
 psycopg2-binary==2.9.10
 python-dotenv==1.2.2
 pandas==2.3.0
+pypdf==6.4.1

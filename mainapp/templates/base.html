@@ -71,6 +71,17 @@
                 <li><a href="{% url 'Skills' %}">Skills</a></li>
                 <li><a href="{% url 'Projects' %}">Projects</a></li>
                 <li><a href="{% url 'Contact' %}">Contact</a></li>
+                {% if user.is_staff %}
+                <li><a href="{% url 'CSV_Admin_Projects' %}">Admin</a></li>
+                <li>
+                    <form method="post" action="{% url 'Logout' %}">
+                        {% csrf_token %}
+                        <button class="nav-logout" type="submit">Log out</button>
+                    </form>
+                </li>
+                {% else %}
+                <li><a href="{% url 'Login' %}">Admin</a></li>
+                {% endif %}
             </ul>
 
             <button class="menu-btn" onclick="toggleMenu()">
@@ -82,6 +93,13 @@
 
     <!-- Main Content -->
     <main>
+        {% if messages %}
+        <div class="site-messages" role="status">
+            {% for message in messages %}
+            <p class="site-message {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
         {% block content %}
 
         {% endblock %}

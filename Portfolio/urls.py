@@ -28,8 +28,11 @@ urlpatterns = [
     path('Projects/<str:project_name>/', views.projectdetail, name='Project_Detail'),
     path('Contact', views.contact, name='Contact'),
     path('admins',views.login_page, name='Login'),
+    path('admins/logout/', views.logout_page, name='Logout'),
+    path('cv/download/', views.download_cv, name='Download_CV'),
     path('csv-projects/', views.csv_admin_projects, name='CSV_Admin_Projects'),
     path('csv-projects/add/', views.add_csv_project, name='CSV_Add_Project'),
     path('csv-projects/edit/<str:project_name>/', views.edit_csv_project, name='CSV_Edit_Project'),
     path('csv-projects/delete/<str:project_name>/', views.delete_csv_project, name='CSV_Delete_Project'),
+    path('csv-projects/cv/', views.update_cv, name='CSV_Update_CV'),
 ]

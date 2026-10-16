@@ -15,16 +15,16 @@ Edit Project
         <form method="POST">
             {% csrf_token %}
 
-            <input type="text" name="Name" value="{{ project.Name }}" required>
-            <input type="text" name="Category" value="{{ project.Category }}" required>
+            <input type="text" name="Name" maxlength="100" value="{{ project.Name }}" required>
+            <input type="text" name="Category" maxlength="100" value="{{ project.Category }}" required>
 
             <textarea name="Description" required>{{ project.Description }}</textarea>
 
             <textarea name="Detail">{{ project.Detail }}</textarea>
 
-            <input type="url" name="Github" value="{{ project.Github }}">
+            <input type="url" name="Github" maxlength="200" value="{{ project.Github }}">
 
-            <input type="url" name="Project" value="{{ project.Project }}">
+            <input type="url" name="Project" maxlength="200" value="{{ project.Project }}">
 
             <button type="submit">
                 Update Project

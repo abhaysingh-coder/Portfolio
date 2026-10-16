@@ -36,13 +36,13 @@
 
         <div class="detail-actions">
 
-            <a href="{{ project.Github }}" target="_blank" class="github-link">
+            <a href="{{ project.Github }}" target="_blank" rel="noopener noreferrer" class="github-link">
                 <i class="fa-brands fa-github"></i>
                 GitHub Repository
             </a>
 
             {% if project.Project %}
-            <a href="{{ project.Project }}" target="_blank" class="live-link">
+            <a href="{{ project.Project }}" target="_blank" rel="noopener noreferrer" class="live-link">
                 Live Demo
                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
             </a>
