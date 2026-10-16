@@ -217,18 +217,35 @@ The admin dashboard lets you add, edit, and remove projects and upload the
 downloadable CV as a PDF (up to 5 MB). The Django administration site is also
 available at `/admin/`.
 
-For deployment, set `DEBUG=False` and provide a strong, private `SECRET_KEY`
-environment variable. The app enables HTTPS redirects, secure cookies, and HSTS
-when debug mode is disabled. If your host uses ephemeral app storage, attach a
-persistent disk and set `PROJECTS_CSV_PATH` and `PORTFOLIO_CV_PATH` to files on
-that disk so admin changes survive restarts and deployments. Render deployments
-default to production mode; set the following in the Render service environment:
+The repository includes `render.yaml` with the Render build/start commands and
+production environment settings. Create a Render PostgreSQL database in the
+same region as the web service. In the database page, copy its **Internal
+Database URL** and set it as `DATABASE_URL` in the web service's Environment
+settings. If creating a new service from the Blueprint, Render prompts for the
+`DATABASE_URL` value on its initial sync. For an existing service, add it
+manually. Save the setting and redeploy; the application deliberately refuses
+to use SQLite in production.
+
+For manual web-service configuration, use:
+
+* Build command: `./build.sh`
+* Start command: `gunicorn Portfolio.wsgi:application`
+
+The build script collects static files and then runs migrations as a separate
+command. `collectstatic` itself does not run migrations. The project enables
+HTTPS redirects, secure cookies, and HSTS when debug mode is disabled. If your
+host uses ephemeral app storage, attach a persistent disk and set
+`PROJECTS_CSV_PATH` and `PORTFOLIO_CV_PATH` to files on that disk so admin
+changes survive restarts and deployments. Configure these Render service
+environment variables:
 
 * `SECRET_KEY`: a unique, randomly generated secret.
 * `DEBUG=False`.
-* `DATABASE_URL`: a persistent PostgreSQL database URL for production.
+* `DATABASE_URL`: the Internal Database URL from the Render PostgreSQL database.
 * `RENDER`: set automatically by Render; this enables the production defaults
   and requires `DATABASE_URL`.
+* `ALLOWED_HOSTS`: optional comma-separated hostnames; Render's
+  `RENDER_EXTERNAL_HOSTNAME` is included automatically.
 * `EMAIL_PERSONAL_USER` and `EMAIL_PERSONAL_PASSWORD`.
 * `EMAIL_PORTFOLIO_USER` and `EMAIL_PORTFOLIO_PASSWORD`.
 * `PROJECTS_CSV_PATH` and `PORTFOLIO_CV_PATH`: paths on the mounted persistent

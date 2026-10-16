@@ -23,7 +23,11 @@ load_dotenv(BASE_DIR / '.env')
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-DEBUG = os.getenv('DEBUG', 'False' if os.getenv('RENDER') else 'True').lower() in {'true', '1', 'yes'}
+IS_RENDER = os.getenv('RENDER', '').lower() in {'true', '1', 'yes'}
+DEBUG = os.getenv('DEBUG', 'False' if IS_RENDER else 'True').lower() in {'true', '1', 'yes'}
+if IS_RENDER and DEBUG:
+    raise ImproperlyConfigured('Set DEBUG=False for Render deployments.')
+
 SECRET_KEY = os.getenv('SECRET_KEY')
 if not SECRET_KEY:
     if not DEBUG:
@@ -31,11 +35,15 @@ if not SECRET_KEY:
     SECRET_KEY = 'local-development-only-key-change-before-deployment-portfolio'
 
 ALLOWED_HOSTS = [
-    ".onrender.com",
-    "localhost",
-    "127.0.0.1",
-    "192.168.29.94"
+    host.strip()
+    for host in os.getenv(
+        'ALLOWED_HOSTS',
+        '.onrender.com,localhost,127.0.0.1,192.168.29.94',
+    ).split(',')
+    if host.strip()
 ]
+if os.getenv('RENDER_EXTERNAL_HOSTNAME'):
+    ALLOWED_HOSTS.append(os.environ['RENDER_EXTERNAL_HOSTNAME'])
 
 CSRF_TRUSTED_ORIGINS = [
     "https://*.onrender.com",
@@ -98,14 +106,28 @@ WSGI_APPLICATION = 'Portfolio.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    "default": dj_database_url.config(
-        default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600
-    )
-}
-if not DEBUG and os.getenv('RENDER') and not os.getenv('DATABASE_URL'):
-    raise ImproperlyConfigured('Set DATABASE_URL to a persistent database for Render deployments.')
+if DEBUG:
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=f'sqlite:///{BASE_DIR / "db.sqlite3"}',
+            conn_max_age=600,
+        )
+    }
+else:
+    database_url = os.getenv('DATABASE_URL')
+    if not database_url:
+        raise ImproperlyConfigured(
+            'Set DATABASE_URL to the persistent PostgreSQL database Internal URL before running in production.'
+        )
+    try:
+        default_database = dj_database_url.parse(database_url, conn_max_age=600)
+    except (TypeError, ValueError) as exc:
+        raise ImproperlyConfigured('DATABASE_URL is not a valid database URL.') from exc
+    if default_database['ENGINE'] != 'django.db.backends.postgresql':
+        raise ImproperlyConfigured('Production DATABASE_URL must use PostgreSQL; SQLite is development-only.')
+    if not default_database.get('NAME') or not default_database.get('HOST'):
+        raise ImproperlyConfigured('DATABASE_URL must include the PostgreSQL database name and host.')
+    DATABASES = {'default': default_database}
 
 
 # Password validation
@@ -142,11 +164,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STORAGES = {
+    'default': {
+        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+    },
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'

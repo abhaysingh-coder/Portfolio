@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: portfolio
+    runtime: python
+    buildCommand: ./build.sh
+    startCommand: gunicorn Portfolio.wsgi:application
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"
