@@ -67,6 +67,17 @@
                 <li><a href="{% url 'Skills' %}">Skills</a></li>
                 <li><a href="{% url 'Projects' %}">Projects</a></li>
                 <li><a href="{% url 'Contact' %}">Contact</a></li>
+                {% if user.is_authenticated and user.is_staff %}
+                <li><a href="{% url 'CSV_Admin_Projects' %}">Admin Dashboard</a></li>
+                {% endif %}
+                {% if user.is_authenticated %}
+                <li>
+                    <form method="post" action="{% url 'Logout' %}">
+                        {% csrf_token %}
+                        <button class="nav-logout" type="submit">Logout</button>
+                    </form>
+                </li>
+                {% endif %}
             </ul>
 
             <button class="menu-btn" type="button" aria-label="Toggle navigation menu" aria-controls="navLinks" aria-expanded="false" onclick="toggleMenu()">

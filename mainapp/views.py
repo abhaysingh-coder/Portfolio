@@ -14,6 +14,7 @@ from pypdf.errors import PdfReadError
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied, ValidationError
 from django.core.mail import get_connection, send_mail
 from django.core.validators import URLValidator
@@ -455,7 +456,7 @@ def valid_project_links(project):
     return True
 
 
-@login_required_custom
+@login_required(login_url='Login')
 @require_POST
 def logout_page(request):
     logout(request)

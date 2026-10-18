@@ -108,6 +108,27 @@ main{
     width:100%;
 }
 
+.nav-links li form{
+    margin:0;
+}
+
+.nav-logout{
+    position:relative;
+    border:0;
+    padding:0;
+    background:none;
+    color:#ffffff;
+    font:inherit;
+    font-size:.95rem;
+    font-weight:500;
+    cursor:pointer;
+    transition:.3s ease;
+}
+
+.nav-logout:hover{
+    color:#38bdf8;
+}
+
 .menu-btn{
     display:none;
     border:none;
@@ -1210,11 +1231,29 @@ main{
         border-bottom:1px solid rgba(255,255,255,.06);
     }
 
+    .nav-links li form{
+        width:100%;
+    }
+
+    .nav-links li .nav-logout{
+        display:block;
+        width:100%;
+        padding:18px 30px;
+        border-bottom:1px solid rgba(255,255,255,.06);
+        text-align:left;
+    }
+
     .nav-links li a::after{
         display:none;
     }
 
     .nav-links li a:hover{
+        background:#38bdf8;
+        color:#020617;
+        padding-left:42px;
+    }
+
+    .nav-links li .nav-logout:hover{
         background:#38bdf8;
         color:#020617;
         padding-left:42px;

@@ -100,6 +100,12 @@ class PortfolioAdminTests(TestCase):
                 self.assertEqual(response.status_code, 200)
                 self.assertNotContains(response, 'href="/admins"')
                 self.assertNotContains(response, 'href="/csv-projects/')
+                self.assertNotContains(response, 'Logout')
+                self.assertContains(response, '>Home<')
+                self.assertContains(response, '>About<')
+                self.assertContains(response, '>Skills<')
+                self.assertContains(response, '>Projects<')
+                self.assertContains(response, '>Contact<')
 
         login_response = self.client.get('/admins')
         self.assertEqual(login_response.status_code, 200)
@@ -136,6 +142,30 @@ class PortfolioAdminTests(TestCase):
         response = self.client.post('/admins/logout/')
         self.assertRedirects(response, '/')
         self.assertRedirects(self.client.get('/csv-projects/'), '/admins')
+
+    def test_staff_navigation_has_dashboard_and_csrf_protected_logout(self):
+        response = self.client.get('/')
+
+        self.assertContains(response, 'Admin Dashboard')
+        self.assertContains(response, 'action="/admins/logout/"')
+        self.assertContains(response, 'name="csrfmiddlewaretoken"')
+        self.assertContains(response, '>Logout</button>')
+
+    def test_authenticated_nonstaff_can_log_out_without_dashboard_access(self):
+        self.client.force_login(self.regular_user)
+        response = self.client.get('/')
+
+        self.assertNotContains(response, 'Admin Dashboard')
+        self.assertContains(response, 'action="/admins/logout/"')
+        self.assertContains(response, '>Logout</button>')
+        self.assertEqual(self.client.get('/csv-projects/').status_code, 403)
+
+        response = self.client.post('/admins/logout/')
+
+        self.assertRedirects(response, '/')
+        response = self.client.get('/')
+        self.assertNotContains(response, 'Admin Dashboard')
+        self.assertNotContains(response, 'Logout')
 
     def test_admin_mutations_require_csrf(self):
         csrf_client = Client(enforce_csrf_checks=True)
