@@ -36,3 +36,8 @@ urlpatterns = [
     path('csv-projects/delete/<str:project_name>/', views.delete_csv_project, name='CSV_Delete_Project'),
     path('csv-projects/cv/', views.update_cv, name='CSV_Update_CV'),
 ]
+
+handler400 = 'mainapp.views.bad_request'
+handler403 = 'mainapp.views.permission_denied'
+handler404 = 'mainapp.views.page_not_found'
+handler500 = 'mainapp.views.server_error'

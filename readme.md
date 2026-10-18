@@ -259,10 +259,10 @@ environment variables:
 
 Copy the current `Data.csv` and CV PDF to those disk paths once before switching
 the service to them. Back up the disk and database regularly. The build script
-collects static assets and applies migrations; create the staff account
-separately with `python manage.py createsuperuser` using the production
-environment (for example, from the Render shell). It intentionally does not
-attempt to create an administrator with missing credentials during every build.
+collects static assets, applies migrations, and then runs the idempotent
+deployment-superuser command. Set both superuser variables in the Render
+environment before deployment to create the account; the command does not
+overwrite an existing account.
 
 ---
 

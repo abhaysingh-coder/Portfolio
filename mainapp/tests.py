@@ -15,7 +15,7 @@ from django.core.management import call_command, CommandError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.migrations.loader import MigrationLoader
-from django.test import Client, TestCase
+from django.test import Client, RequestFactory, TestCase
 from django.test.utils import override_settings
 from pypdf import PdfWriter
 
@@ -73,9 +73,45 @@ class PortfolioAdminTests(TestCase):
         response = self.client.get('/csv-projects/')
         self.assertRedirects(response, '/admins')
 
+    def test_unauthenticated_users_cannot_submit_protected_admin_actions(self):
+        self.client.logout()
+        original_csv = self.csv_path.read_bytes()
+        original_cv = self.cv_path.read_bytes()
+        protected_posts = (
+            '/csv-projects/add/',
+            '/csv-projects/edit/Existing-Project/',
+            '/csv-projects/delete/Existing-Project/',
+            '/csv-projects/cv/',
+        )
+
+        for url in protected_posts:
+            with self.subTest(url=url):
+                response = self.client.post(url)
+                self.assertRedirects(response, '/admins')
+
+        self.assertEqual(self.csv_path.read_bytes(), original_csv)
+        self.assertEqual(self.cv_path.read_bytes(), original_cv)
+
+    def test_public_navigation_hides_admin_links_but_login_page_remains_available(self):
+        self.client.logout()
+        for url in ('/', '/About', '/Skills', '/Projects', '/Contact'):
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertEqual(response.status_code, 200)
+                self.assertNotContains(response, 'href="/admins"')
+                self.assertNotContains(response, 'href="/csv-projects/')
+
+        login_response = self.client.get('/admins')
+        self.assertEqual(login_response.status_code, 200)
+        self.assertContains(login_response, 'name="username"')
+        self.assertContains(login_response, 'name="password"')
+
     def test_regular_user_is_forbidden_and_cannot_login_as_admin(self):
         self.client.force_login(self.regular_user)
-        self.assertEqual(self.client.get('/csv-projects/').status_code, 403)
+        with override_settings(DEBUG=False):
+            response = self.client.get('/csv-projects/')
+        self.assertEqual(response.status_code, 403)
+        self.assertContains(response, 'Access denied', status_code=403)
         self.client.logout()
 
         response = self.client.post('/admins', {
@@ -91,6 +127,7 @@ class PortfolioAdminTests(TestCase):
         response = self.client.post('/admins', {
             'username': 'portfolio-admin',
             'password': 'safe-test-password',
+            'next': 'https://attacker.example/',
         })
         self.assertRedirects(response, '/csv-projects/')
         self.assertEqual(self.client.get('/csv-projects/').status_code, 200)
@@ -103,9 +140,10 @@ class PortfolioAdminTests(TestCase):
     def test_admin_mutations_require_csrf(self):
         csrf_client = Client(enforce_csrf_checks=True)
         csrf_client.force_login(self.user)
-        self.assertEqual(csrf_client.post(
-            '/csv-projects/delete/Existing-Project/',
-        ).status_code, 403)
+        with override_settings(DEBUG=False):
+            response = csrf_client.post('/csv-projects/delete/Existing-Project/')
+        self.assertEqual(response.status_code, 403)
+        self.assertContains(response, 'Access denied', status_code=403)
         self.assertEqual(self.csv_path.read_text(encoding='utf-8').count('Existing-Project'), 1)
 
     def test_add_project_preserves_existing_rows_and_assigns_serial_number(self):
@@ -305,6 +343,15 @@ class PortfolioAdminTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertNotContains(response, 'javascript:alert(1)')
+        self.assertNotContains(response, 'href=""')
+
+    def test_missing_project_uses_branded_not_found_page(self):
+        with override_settings(DEBUG=False):
+            response = self.client.get('/Projects/Unknown-Project/')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, 'Page not found', status_code=404)
+        self.assertContains(response, 'href="/Projects"', status_code=404)
 
     def test_public_pages_and_cv_download_work(self):
         for url in ('/', '/About', '/Skills', '/Projects', '/Contact'):
@@ -490,3 +537,67 @@ class DeploymentSuperuserCommandTests(TestCase):
         self.assertTrue(user.is_staff)
         self.assertFalse(user.is_superuser)
         self.assertTrue(user.check_password('ExistingPassword-that-must-remain!'))
+
+
+class HttpErrorPageTests(TestCase):
+    def test_malformed_host_returns_custom_bad_request_page(self):
+        with override_settings(DEBUG=False):
+            response = self.client.get('/', HTTP_HOST='malformed host')
+
+        self.assertEqual(response.status_code, 400)
+        self.assertContains(response, 'Bad request', status_code=400)
+        self.assertNotIn(b'malformed host', response.content)
+
+    def test_missing_route_uses_custom_not_found_page(self):
+        with override_settings(DEBUG=False):
+            response = self.client.get('/this-route-does-not-exist/')
+            malformed_parameter = self.client.get('/Projects/name%2Fwith%2Fslashes/')
+
+        self.assertEqual(response.status_code, 404)
+        self.assertContains(response, 'Page not found', status_code=404)
+        self.assertContains(response, 'href="/"', status_code=404)
+        self.assertContains(response, 'href="/Projects"', status_code=404)
+        self.assertNotIn(b'Traceback', response.content)
+        self.assertEqual(malformed_parameter.status_code, 404)
+        self.assertContains(malformed_parameter, 'Page not found', status_code=404)
+
+    def test_bad_request_and_forbidden_handlers_return_correct_status(self):
+        from .views import bad_request, permission_denied
+
+        request_factory = RequestFactory()
+        bad_response = bad_request(request_factory.get('/'), Exception('private details'))
+        forbidden_response = permission_denied(request_factory.get('/'), Exception('private details'))
+
+        self.assertEqual(bad_response.status_code, 400)
+        self.assertContains(bad_response, 'Bad request', status_code=400)
+        self.assertNotIn(b'private details', bad_response.content)
+        self.assertEqual(forbidden_response.status_code, 403)
+        self.assertContains(forbidden_response, 'Access denied', status_code=403)
+        self.assertNotIn(b'private details', forbidden_response.content)
+
+    def test_csrf_failure_uses_generic_forbidden_page(self):
+        from .views import csrf_failure
+
+        response = csrf_failure(RequestFactory().post('/'), 'sensitive internal reason')
+
+        self.assertEqual(response.status_code, 403)
+        self.assertContains(response, 'Access denied', status_code=403)
+        self.assertNotIn(b'sensitive internal reason', response.content)
+
+    def test_unexpected_view_error_returns_generic_server_error_page(self):
+        client = Client(raise_request_exception=False)
+        with override_settings(DEBUG=False):
+            from Portfolio.urls import urlpatterns
+
+            with patch.object(
+                urlpatterns[1],
+                'callback',
+                side_effect=RuntimeError('private exception details'),
+            ):
+                with self.assertLogs('django.request', level='ERROR'):
+                    response = client.get('/')
+
+        self.assertEqual(response.status_code, 500)
+        self.assertContains(response, 'Something went wrong', status_code=500)
+        self.assertNotIn(b'private exception details', response.content)
+        self.assertNotIn(b'Traceback', response.content)

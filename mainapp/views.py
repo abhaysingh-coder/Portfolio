@@ -14,10 +14,10 @@ from pypdf.errors import PdfReadError
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
-from django.core.exceptions import ImproperlyConfigured, ValidationError
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied, ValidationError
 from django.core.mail import get_connection, send_mail
 from django.core.validators import URLValidator
-from django.http import FileResponse, Http404, HttpResponseForbidden, HttpResponseNotAllowed
+from django.http import FileResponse, Http404, HttpResponseNotAllowed
 from django.shortcuts import redirect, render
 from django.views.decorators.cache import cache_control
 from django.views.decorators.http import require_POST
@@ -42,7 +42,7 @@ def login_required_custom(view_func):
         if not request.user.is_authenticated:
             return redirect('Login')
         if not request.user.is_staff:
-            return HttpResponseForbidden()
+            raise PermissionDenied
         return view_func(request, *args, **kwargs)
     return wrapper
 
@@ -74,6 +74,59 @@ def project_data_error(request, exc):
         'error.html',
         {'error': 'Project data is temporarily unavailable. Please check the project CSV file.'},
         status=503,
+    )
+
+
+def render_http_error(request, status_code, title, message):
+    return render(
+        request,
+        'http_error.html',
+        {
+            'status_code': status_code,
+            'title': title,
+            'message': message,
+        },
+        status=status_code,
+    )
+
+
+def bad_request(request, exception=None):
+    return render_http_error(
+        request,
+        400,
+        'Bad request',
+        'The request could not be understood. Check the address or try again.',
+    )
+
+
+def permission_denied(request, exception=None):
+    return render_http_error(
+        request,
+        403,
+        'Access denied',
+        'You do not have permission to view this page.',
+    )
+
+
+def csrf_failure(request, reason=''):
+    return permission_denied(request)
+
+
+def page_not_found(request, exception=None):
+    return render_http_error(
+        request,
+        404,
+        'Page not found',
+        'The page may have moved, the address may be incorrect, or the content may no longer be available.',
+    )
+
+
+def server_error(request):
+    return render_http_error(
+        request,
+        500,
+        'Something went wrong',
+        'An unexpected error occurred. Please try again later.',
     )
 
 
@@ -195,7 +248,7 @@ def projectdetail(request, project_name):
         return project_data_error(request, exc)
     project = data[data['Name'].astype(str) == project_name]
     if project.empty:
-        return render(request, 'error.html', {'error': 'Project not found.'}, status=404)
+        raise Http404('Project not found.')
     project_record = safe_project_links(project.iloc[0].to_dict())
     return render(request, 'projectdetail.html', {'project': project_record})
 
@@ -315,7 +368,7 @@ def edit_csv_project(request, project_name):
                 data = read_projects_csv()
                 project = data[data['Name'].astype(str) == project_name]
                 if project.empty:
-                    return render(request, 'error.html', {'error': 'Project not found.'}, status=404)
+                    raise Http404('Project not found.')
                 index = project.index[0]
                 updated_project = {
                     'Name': request.POST.get('Name', '').strip(),
@@ -356,7 +409,7 @@ def edit_csv_project(request, project_name):
         return project_data_error(request, exc)
     project = data[data['Name'].astype(str) == project_name]
     if project.empty:
-        return render(request, 'error.html', {'error': 'Project not found.'}, status=404)
+        raise Http404('Project not found.')
     return render(request, 'edit_csv_project.html', {'project': project.iloc[0].to_dict()})
 
 
@@ -368,7 +421,7 @@ def delete_csv_project(request, project_name):
         with lock_projects_csv():
             data = read_projects_csv()
             if not data['Name'].astype(str).eq(project_name).any():
-                return render(request, 'error.html', {'error': 'Project not found.'}, status=404)
+                raise Http404('Project not found.')
             data = data[data['Name'].astype(str) != project_name]
             save_projects_csv(data)
     except ProjectDataError as exc:

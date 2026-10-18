@@ -62,9 +62,13 @@ CSV Project Admin
                     </td>
 
                     <td>
+                        {% if project.Github %}
                         <a href="{{ project.Github }}" target="_blank" rel="noopener noreferrer">
                             GitHub
                         </a>
+                        {% else %}
+                        No Link
+                        {% endif %}
                     </td>
 
                     <td>

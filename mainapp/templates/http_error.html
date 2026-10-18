@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ status_code }} {{ title }} | Abhay Singh{% endblock %}
+
+{% block content %}
+<section class="error-page" role="alert">
+    <div class="error-container">
+        <div class="error-icon">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+        </div>
+        <h1>{{ status_code }}</h1>
+        <h2>{{ title }}</h2>
+        <p>{{ message }}</p>
+        <div class="error-buttons">
+            <a href="{% url 'Index' %}" class="btn">
+                <i class="fa-solid fa-house"></i>
+                Home
+            </a>
+            <a href="{% url 'Projects' %}" class="btn btn-outline">Projects</a>
+            <a href="{% url 'Contact' %}" class="btn btn-outline">Contact</a>
+        </div>
+    </div>
+</section>
+{% endblock %}

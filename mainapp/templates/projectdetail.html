@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load static %}
 {% load custom_filters %}
 
 {% block title %}
@@ -36,10 +35,12 @@
 
         <div class="detail-actions">
 
+            {% if project.Github %}
             <a href="{{ project.Github }}" target="_blank" rel="noopener noreferrer" class="github-link">
                 <i class="fa-brands fa-github"></i>
                 GitHub Repository
             </a>
+            {% endif %}
 
             {% if project.Project %}
             <a href="{{ project.Project }}" target="_blank" rel="noopener noreferrer" class="live-link">

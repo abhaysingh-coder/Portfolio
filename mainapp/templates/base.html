@@ -15,10 +15,6 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="{% static 'Image/favicon.png' %}" type="image/x-icon">
 
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <meta name="title" content="Abhay Singh | Data Analyst | Data Scientist | Django Developer">
 
     <meta name="description" content="Official portfolio of Abhay Singh showcasing Data Analytics, Data Science, Machine Learning, Deep Learning, Django Development, Power BI Dashboards, Recommendation Systems, and Web Development projects.">
@@ -71,20 +67,9 @@
                 <li><a href="{% url 'Skills' %}">Skills</a></li>
                 <li><a href="{% url 'Projects' %}">Projects</a></li>
                 <li><a href="{% url 'Contact' %}">Contact</a></li>
-                {% if user.is_staff %}
-                <li><a href="{% url 'CSV_Admin_Projects' %}">Admin</a></li>
-                <li>
-                    <form method="post" action="{% url 'Logout' %}">
-                        {% csrf_token %}
-                        <button class="nav-logout" type="submit">Log out</button>
-                    </form>
-                </li>
-                {% else %}
-                <li><a href="{% url 'Login' %}">Admin</a></li>
-                {% endif %}
             </ul>
 
-            <button class="menu-btn" onclick="toggleMenu()">
+            <button class="menu-btn" type="button" aria-label="Toggle navigation menu" aria-controls="navLinks" aria-expanded="false" onclick="toggleMenu()">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
