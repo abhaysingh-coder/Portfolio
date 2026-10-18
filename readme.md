@@ -242,6 +242,12 @@ environment variables:
 * `SECRET_KEY`: a unique, randomly generated secret.
 * `DEBUG=False`.
 * `DATABASE_URL`: the Internal Database URL from the Render PostgreSQL database.
+* `DJANGO_SUPERUSER_USERNAME` and `DJANGO_SUPERUSER_PASSWORD`: optional
+  credentials used by the build script after migrations to create the initial
+  deployment superuser. If the username already exists, its credentials and
+  permissions are left unchanged; an existing non-superuser with that username
+  causes the build to stop with a safe error. Rotate or remove these variables
+  after provisioning if they are no longer needed.
 * `RENDER`: set automatically by Render; this enables the production defaults
   and requires `DATABASE_URL`.
 * `ALLOWED_HOSTS`: optional comma-separated hostnames; Render's

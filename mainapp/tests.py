@@ -11,6 +11,7 @@ from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
+from django.core.management import call_command, CommandError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.db import connection
 from django.db.migrations.loader import MigrationLoader
@@ -423,3 +424,69 @@ class PortfolioAdminTests(TestCase):
         loader = MigrationLoader(connection)
         self.assertIn(('mainapp', '0002_request'), loader.applied_migrations)
         self.assertEqual(Request.objects.count(), 0)
+
+
+@override_settings(PASSWORD_HASHERS=['django.contrib.auth.hashers.MD5PasswordHasher'])
+class DeploymentSuperuserCommandTests(TestCase):
+    def setUp(self):
+        self.username = 'render-admin'
+        self.password = 'DeploymentPassword-is-valid-2026!'
+        self.env = patch.dict(os.environ, {
+            'DJANGO_SUPERUSER_USERNAME': self.username,
+            'DJANGO_SUPERUSER_PASSWORD': self.password,
+        })
+        self.env.start()
+        self.addCleanup(self.env.stop)
+
+    def test_creates_superuser_and_is_idempotent_without_changing_password(self):
+        output = io.StringIO()
+
+        call_command('ensure_deploy_superuser', stdout=output)
+        user = get_user_model().objects.get(username=self.username)
+        self.assertTrue(user.is_staff)
+        self.assertTrue(user.is_superuser)
+        self.assertTrue(user.check_password(self.password))
+
+        user.set_password('ChangedPassword-that-must-remain!')
+        user.save()
+        output = io.StringIO()
+        call_command('ensure_deploy_superuser', stdout=output)
+
+        user.refresh_from_db()
+        self.assertTrue(user.check_password('ChangedPassword-that-must-remain!'))
+        self.assertNotIn(self.password, output.getvalue())
+        self.assertIn('already exists', output.getvalue())
+
+    def test_skips_when_both_credentials_are_unset(self):
+        with patch.dict(os.environ, {
+            'DJANGO_SUPERUSER_USERNAME': '',
+            'DJANGO_SUPERUSER_PASSWORD': '',
+        }):
+            output = io.StringIO()
+            call_command('ensure_deploy_superuser', stdout=output)
+
+        self.assertEqual(get_user_model().objects.count(), 0)
+        self.assertIn('skipping', output.getvalue())
+
+    def test_rejects_partially_configured_credentials(self):
+        with patch.dict(os.environ, {'DJANGO_SUPERUSER_PASSWORD': ''}):
+            with self.assertRaisesMessage(CommandError, 'Both DJANGO_SUPERUSER_USERNAME'):
+                call_command('ensure_deploy_superuser', stdout=io.StringIO())
+
+        self.assertEqual(get_user_model().objects.count(), 0)
+
+    def test_existing_non_superuser_is_not_elevated(self):
+        user = get_user_model().objects.create_user(
+            username=self.username,
+            password='ExistingPassword-that-must-remain!',
+            is_staff=True,
+            is_superuser=False,
+        )
+
+        with self.assertRaisesMessage(CommandError, 'already exists but is not a superuser'):
+            call_command('ensure_deploy_superuser', stdout=io.StringIO())
+
+        user.refresh_from_db()
+        self.assertTrue(user.is_staff)
+        self.assertFalse(user.is_superuser)
+        self.assertTrue(user.check_password('ExistingPassword-that-must-remain!'))
